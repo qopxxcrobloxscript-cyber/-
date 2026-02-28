@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PaintStudio</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap');
@@ -28,6 +28,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     user-select: none;
   }
@@ -37,6 +38,9 @@
     background: var(--panel);
     border-bottom: 1px solid var(--border);
     padding: 8px 16px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
     display: flex;
     align-items: center;
     gap: 16px;
@@ -355,7 +359,8 @@
     display: none;
     background: var(--panel);
     border-top: 1px solid var(--border);
-    padding: 6px 8px;
+    padding: 8px 8px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
     gap: 6px;
     flex-shrink: 0;
     align-items: center;
@@ -364,9 +369,9 @@
   }
 
   .bottom-color-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
     border: 2px solid var(--border);
     cursor: pointer;
     flex-shrink: 0;
@@ -383,9 +388,9 @@
   }
 
   .bottom-bar-tool {
-    width: 38px;
-    height: 38px;
-    border-radius: 8px;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
     border: 2px solid transparent;
     background: transparent;
     color: var(--text2);
@@ -397,13 +402,13 @@
     transition: all 0.15s;
     font-size: 10px;
   }
-  .bottom-bar-tool svg { width: 18px; height: 18px; }
+  .bottom-bar-tool svg { width: 22px; height: 22px; }
   .bottom-bar-tool.active { background: rgba(124,106,255,0.2); border-color: var(--accent); color: var(--accent); }
 
   .bottom-settings-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
     border: 1px solid var(--border);
     background: var(--panel2);
     color: var(--text2);
@@ -412,7 +417,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 18px;
+    font-size: 20px;
   }
 
   /* Mobile settings panel (slide-up) */
@@ -426,8 +431,9 @@
     border-top: 1px solid var(--border);
     border-radius: 16px 16px 0 0;
     padding: 16px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
     z-index: 200;
-    max-height: 80vh;
+    max-height: 80dvh;
     overflow-y: auto;
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
