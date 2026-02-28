@@ -355,11 +355,111 @@
     display: none;
     background: var(--panel);
     border-top: 1px solid var(--border);
-    padding: 8px;
-    gap: 8px;
+    padding: 6px 8px;
+    gap: 6px;
     flex-shrink: 0;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 20;
   }
+
+  .bottom-color-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .bottom-bar-tools {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .bottom-bar-tool {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 10px;
+  }
+  .bottom-bar-tool svg { width: 18px; height: 18px; }
+  .bottom-bar-tool.active { background: rgba(124,106,255,0.2); border-color: var(--accent); color: var(--accent); }
+
+  .bottom-settings-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+
+  /* Mobile settings panel (slide-up) */
+  .mobile-panel {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    border-radius: 16px 16px 0 0;
+    padding: 16px;
+    z-index: 200;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .mobile-panel.open {
+    transform: translateY(0);
+  }
+
+  .mobile-panel-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+
+  .mobile-panel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 199;
+  }
+  .mobile-panel-overlay.open { display: block; }
+
+  .mobile-panel .panel-section {
+    border: none;
+    padding: 0 0 16px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mobile-panel .panel-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
   /* Cursor crosshair circle */
   .cursor-circle {
@@ -393,9 +493,12 @@
   .toast.show { opacity: 1; transform: translateY(0); }
 
   @media (max-width: 700px) {
-    .toolbar { width: 50px; }
+    .toolbar { display: none; }
     .right-panel { display: none; }
     .bottom-bar { display: flex; }
+    .mobile-panel { display: block; }
+    header .logo { font-size: 15px; }
+    .btn { padding: 6px 10px; font-size: 12px; }
   }
 </style>
 </head>
@@ -529,6 +632,71 @@
   </div>
 </div>
 
+<!-- Mobile bottom bar -->
+<div class="bottom-bar" id="bottomBar">
+  <div class="bottom-color-btn" id="bottomColorBtn" onclick="openMobilePanel()"></div>
+  <div class="bottom-bar-tools">
+    <button class="bottom-bar-tool active" id="btool-pen" onclick="setTool('pen');syncBottomTools()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>
+    <button class="bottom-bar-tool" id="btool-brush" onclick="setTool('brush');syncBottomTools()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a1 1 0 0 0-1.41 0L9 12.25 11.75 15l8.96-8.96a1 1 0 0 0 0-1.41z"/></svg></button>
+    <button class="bottom-bar-tool" id="btool-pencil" onclick="setTool('pencil');syncBottomTools()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg></button>
+    <button class="bottom-bar-tool" id="btool-watercolor" onclick="setTool('watercolor');syncBottomTools()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></button>
+    <button class="bottom-bar-tool" id="btool-eraser" onclick="setTool('eraser');syncBottomTools()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.79.78-.79 2.04 0 2.83L5.03 20H20v-2h-5.93l8.44-8.44c.79-.79.79-2.05 0-2.84l-5.96-5.13A1.97 1.97 0 0 0 15.14 3zm.42 2.12l5.16 5.17-7.35 7.35-4.6-4.6 6.79-7.92z"/></svg></button>
+    <button class="bottom-bar-tool" id="btool-fill" onclick="setTool('fill');syncBottomTools()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15a1.49 1.49 0 0 0 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/></svg></button>
+    <button class="bottom-bar-tool" id="btool-line" onclick="setTool('line');syncBottomTools()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></button>
+  </div>
+  <button class="bottom-settings-btn" onclick="openMobilePanel()">⚙</button>
+</div>
+
+<!-- Mobile overlay -->
+<div class="mobile-panel-overlay" id="mobilePanelOverlay" onclick="closeMobilePanel()"></div>
+
+<!-- Mobile settings panel -->
+<div class="mobile-panel" id="mobilePanel">
+  <div class="mobile-panel-handle"></div>
+  <div class="panel-section">
+    <div class="panel-title">カラー</div>
+    <div class="color-main">
+      <div class="color-swatch" id="colorSwatchMobile" style="background:#000000" onclick="document.getElementById('colorPickerMobile').click()"></div>
+      <div class="color-inputs">
+        <input type="text" class="color-hex" id="hexInputMobile" value="#000000" maxlength="7" oninput="onHexInput(this.value)">
+        <input type="color" id="colorPickerMobile" value="#000000" oninput="onColorPick(this.value)">
+      </div>
+    </div>
+    <div class="palette" id="paletteMobile"></div>
+  </div>
+  <div class="panel-section">
+    <div class="panel-title">ブラシ設定</div>
+    <div class="slider-row">
+      <div class="slider-label">サイズ</div>
+      <input type="range" id="sizeSliderMobile" min="1" max="100" value="10" oninput="onSizeChange(this.value)">
+      <div class="slider-val" id="sizeValMobile">10</div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-label">不透明度</div>
+      <input type="range" id="opacitySliderMobile" min="1" max="100" value="100" oninput="onOpacityChange(this.value)">
+      <div class="slider-val" id="opacityValMobile">100</div>
+    </div>
+  </div>
+  <div class="panel-section">
+    <div class="panel-title">合成モード</div>
+    <select id="blendModeMobile" onchange="onBlendChange(this.value)">
+      <option value="source-over">通常</option>
+      <option value="multiply">乗算</option>
+      <option value="screen">スクリーン</option>
+      <option value="overlay">オーバーレイ</option>
+      <option value="darken">暗く</option>
+      <option value="lighten">明るく</option>
+      <option value="color-dodge">覆い焼き</option>
+      <option value="color-burn">焼き込み</option>
+      <option value="difference">差の絶対値</option>
+    </select>
+  </div>
+  <div class="panel-section" style="display:flex;gap:8px;border-bottom:none;padding-bottom:24px;">
+    <button class="btn" style="flex:1;justify-content:center" onclick="undoCanvas()">↩ 元に戻す</button>
+    <button class="btn danger" style="flex:1;justify-content:center" onclick="clearCanvas()">🗑 クリア</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -585,20 +753,33 @@ const paletteColors = [
   '#ffe4e1','#f0e68c','#e6e6fa','#b0e0e6',
 ];
 const palette = document.getElementById('palette');
-paletteColors.forEach(c => {
-  const d = document.createElement('div');
-  d.className = 'pal-color';
-  d.style.background = c;
-  d.title = c;
-  d.onclick = () => setColor(c);
-  palette.appendChild(d);
+['palette','paletteMobile'].forEach(palId => {
+  const pal = document.getElementById(palId);
+  if (!pal) return;
+  paletteColors.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'pal-color';
+    d.style.background = c;
+    d.title = c;
+    d.onclick = () => { setColor(c); };
+    pal.appendChild(d);
+  });
 });
 
 function setColor(c) {
   currentColor = c;
-  document.getElementById('colorSwatch').style.background = c;
-  document.getElementById('hexInput').value = c.toUpperCase();
-  document.getElementById('colorPicker').value = c;
+  // Sync all color UI elements
+  ['colorSwatch','colorSwatchMobile'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.style.background = c;
+  });
+  ['hexInput','hexInputMobile'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = c.toUpperCase();
+  });
+  ['colorPicker','colorPickerMobile'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = c;
+  });
+  const btn = document.getElementById('bottomColorBtn');
+  if(btn) btn.style.background = c;
   updateBrushPreview();
 }
 
@@ -612,14 +793,16 @@ function onHexInput(v) {
 
 function onSizeChange(v) {
   brushSize = parseInt(v);
-  document.getElementById('sizeVal').textContent = v;
+  ['sizeVal','sizeValMobile'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=v; });
+  ['sizeSlider','sizeSliderMobile'].forEach(id => { const el=document.getElementById(id); if(el) el.value=v; });
   updateBrushPreview();
   updateCursorCircle();
 }
 
 function onOpacityChange(v) {
   brushOpacity = parseInt(v) / 100;
-  document.getElementById('opacityVal').textContent = v;
+  ['opacityVal','opacityValMobile'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=v; });
+  ['opacitySlider','opacitySliderMobile'].forEach(id => { const el=document.getElementById(id); if(el) el.value=v; });
   updateBrushPreview();
 }
 
@@ -911,6 +1094,22 @@ document.addEventListener('keydown', e => {
 });
 
 window.addEventListener('resize', fitCanvasToArea);
+
+function openMobilePanel() {
+  document.getElementById('mobilePanel').classList.add('open');
+  document.getElementById('mobilePanelOverlay').classList.add('open');
+}
+function closeMobilePanel() {
+  document.getElementById('mobilePanel').classList.remove('open');
+  document.getElementById('mobilePanelOverlay').classList.remove('open');
+}
+
+function syncBottomTools() {
+  document.querySelectorAll('.bottom-bar-tool').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('btool-' + currentTool);
+  if (btn) btn.classList.add('active');
+}
+
 </script>
 </body>
 </html>
