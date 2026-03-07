@@ -756,7 +756,10 @@ document.addEventListener('keydown', e => {
   }
 });
 
-window.addEventListener('resize', resetView);
+window.addEventListener('resize', () => {
+  // On resize, just re-apply current transform — no zoom/angle/pan reset
+  applyViewport();
+});
 </script>
 </body>
 </html>
